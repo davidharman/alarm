@@ -6,3 +6,18 @@ I wanted:
 - to provide just an hour and minute
 - a countdown to show how long left
 - start and stop times to be shown if CTRL+C is shown 
+
+
+First install TermDown
+<i>pip install termdown</i>
+
+Then place the three scripts in this repo in to your bin folder
+
+Now run Alarm
+
+alarm 10:00
+
+You will now get a timer for the remaining minutes from now until 10:00 and at the end a beep will sound.
+
+
+Please Note: Modify the timer script if you want to change the sound.
