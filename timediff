@@ -1,0 +1,28 @@
+#!/bin/zsh
+trap ctrl_c INT
+
+function ctrl_c() {
+        echo "** Trapped CTRL-C"
+        echo "Stopped: $(date "+%H:%M:%S")"        
+        exit
+}
+if [ "$1" = "-h" ]; then
+   echo "Provides the number of seconds until a certain time from now
+Usage: timediff HH:MM <-v>
+   -v Provides verbose details about the time
+   -h This help
+"
+exit
+fi
+
+timenow=$(date "+%s")
+timegiven=$(date -j -f '%H:%M' $1 +%s)
+
+
+if [ "$2" = "-v" ]; then
+   echo "Time given: $1 Epoch Time: $timegiven"
+   echo "Time now: $(date -j -f "%s" $timenow +"%H:%M:%S") Epoch Time: $timenow"
+fi
+
+echo "$(($timegiven-$timenow))s"
+exit
