@@ -20,4 +20,4 @@ alarm 10:00 Meeting starwars
 You will now get a timer for the remaining minutes showing the word meeting in the starwars font from now until 10:00 and at the end a beep will sound.
 
 
-Please Note: Modify the timer script if you want to change the sound.
+Please Note: Modify the alarm script if you want to change the sound.
