@@ -11,13 +11,13 @@ I wanted:
 First install TermDown
 <i>pip install termdown</i>
 
-Then place the three scripts in this repo in to your bin folder
+Then place the alarm script from this repo in to your bin folder
 
 Now run Alarm
 
-alarm 10:00
+alarm 10:00 Meeting starwars
 
-You will now get a timer for the remaining minutes from now until 10:00 and at the end a beep will sound.
+You will now get a timer for the remaining minutes showing the word meeting in the starwars font from now until 10:00 and at the end a beep will sound.
 
 
 Please Note: Modify the timer script if you want to change the sound.
