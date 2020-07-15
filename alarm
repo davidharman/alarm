@@ -1,0 +1,41 @@
+#!/bin/zsh
+trap ctrl_c INT
+
+function ctrl_c() {
+        echo "** Trapped CTRL-C"
+        echo "Stopped: $(date "+%H:%M:%S")"        
+        exit
+}
+if [ "$1" = "-h" ]; then
+   echo "Usage: timer [TIME] [TEXT] [FONT]
+  
+  Re-uses TermDown to default some options such as voice and font
+
+  Starts a countdown to or from TIME. Example values for TIME:
+  10, '1h 5m 30s', '12:00', '2020-01-01', '2020-01-01 14:00 UTC'.
+
+  If TIME is not given, termdown will operate in stopwatch mode
+  and count forward.
+
+  TEXT is optional, when used will provide a banner at the top to describe the alarm.
+
+  FONT is optional and if not provided will default to big font, other fonts are starwars, epic, isometric1, basic, doh
+  Default for termdown is univers
+
+  More examples here: http://www.figlet.org/examples.html
+"
+exit
+fi
+
+fontchoice=$3
+if [ -z "$fontchoice" ]; then
+   fontchoice="big"
+fi
+
+timenow="$2$(date "+%n%H:%M:%S")"
+echo "Timer: $1" 
+echo $timenow
+termdown -B -f $fontchoice -v Fiona -T $timenow -c 10 $1 
+afplay ~/Music/sounds/alarm.wav
+echo "Ended: $(date "+%H:%M:%S")"
+exit
