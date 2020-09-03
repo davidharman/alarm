@@ -27,6 +27,9 @@ if [ "$1" = "-h" ]; then
 exit
 fi
 
+if [ -z "$2" ]; then
+   2="Alarm"
+fi
 fontchoice=$3
 if [ -z "$fontchoice" ]; then
    fontchoice="big"
@@ -36,6 +39,8 @@ timenow="$2$(date "+%n%H:%M:%S")"
 echo "Timer: $1" 
 echo $timenow
 termdown -B -f $fontchoice -v Fiona -T $timenow -c 10 $1 
-afplay ~/Music/sounds/alarm.wav
+#afplay /System/Library/Sounds/Sosumi.aiff
+echo 
+say $2
 echo "Ended: $(date "+%H:%M:%S")"
 exit
