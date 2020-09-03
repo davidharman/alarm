@@ -13,11 +13,9 @@ First install TermDown
 
 Then place the alarm script from this repo in to your bin folder
 
-Now run Alarm
+Now run Alarm, command is alarm <time> [Text] [Font]
+  Text and Font are optional, if no text then it defaults to the word Alarm
 
 alarm 10:00 Meeting starwars
 
 You will now get a timer for the remaining minutes showing the word meeting in the starwars font from now until 10:00 and at the end a beep will sound.
-
-
-Please Note: Modify the alarm script if you want to change the sound.
