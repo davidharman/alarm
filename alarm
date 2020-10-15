@@ -35,12 +35,19 @@ if [ -z "$fontchoice" ]; then
    fontchoice="big"
 fi
 
-timenow="$2$(date "+%n%H:%M:%S")"
+# Combine Text and Start Time
+textstring="$2$(date "+%n%H:%M:%S")"
+# Echo details of timer to confirm when timer was started, ended or cancelled and what the parameters where
 echo "Timer: $1" 
-echo $timenow
-termdown -B -f $fontchoice -v Fiona -T $timenow -c 10 $1 
+echo $textstring
+textstring2=$2$'\n -- '$1' --'
+# Command to show countdown timer using the parameters with the Fiona voice
+termdown -B -f $fontchoice -v Fiona -T $textstring2 -c 10 $1 
+# Uncomment this if you want a sound to play as well as the say command
 #afplay /System/Library/Sounds/Sosumi.aiff
 echo 
+# Says the word provided, if no word it says Alarm
 say $2
+# Shows when the code ended
 echo "Ended: $(date "+%H:%M:%S")"
 exit
