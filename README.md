@@ -18,4 +18,6 @@ Now run Alarm, command is alarm <time> [Text] [Font]
 
 alarm 10:00 Meeting starwars
 
+alarm 13:50 'Staff Meeting'
+
 You will now get a timer for the remaining minutes showing the word meeting in the starwars font from now until 10:00 and at the end a beep will sound.
