@@ -3,7 +3,7 @@ Alarm in Bash with the use of termdown (https://github.com/trehn/termdown).
 
 I wanted:
 - a simple alarm which can be set via a terminal (e.g. Bash, Zsh, etc)
-- Only need to provide an hour and minute and optional text
+- only need to provide an hour and minute and optional text
 - a countdown to show how long left
 - start and stop times to be shown if CTRL+C is shown 
 
