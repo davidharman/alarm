@@ -20,4 +20,4 @@ alarm 10:00 Meeting starwars
 
 alarm 13:50 'Staff Meeting'
 
-You will now get a timer for the remaining minutes showing the word meeting in the starwars font from now until 10:00 and at the end a beep will sound.
+You will now get a timer for the remaining minutes showing the word meeting in the 'Fiona' font from now until 10:00 and at the end a beep will sound and a dialog will appear asking if you want to snooze for an amount of minutes or to stop.  If you choose stop the code stops, if you click snooze it will snooze for the number of minutes entered (default is 2).
