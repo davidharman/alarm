@@ -7,7 +7,7 @@ function ctrl_c() {
         exit
 }
 if [ "$1" = "-h" ]; then
-   echo "Usage: timer [TIME] [TEXT] [FONT]
+   echo "Usage: alarm [TIME] [TEXT] [FONT]
   
   Re-uses TermDown to default some options such as voice and font
 
@@ -37,17 +37,54 @@ fi
 
 # Combine Text and Start Time
 textstring="$2$(date "+%n%H:%M:%S")"
+
 # Echo details of timer to confirm when timer was started, ended or cancelled and what the parameters where
 echo "Timer: $1" 
 echo $textstring
 textstring2=$2$'\n -- '$1' --'
-# Command to show countdown timer using the parameters with the Fiona voice
-termdown -B -f $fontchoice -v Fiona -T $textstring2 -c 10 $1 
+mycontinue=1
+# Command to show countdown timer using the parameters with the voice
+until [[ $mycontinue -eq 0 ]]
+do
+	termdown -B -f $fontchoice -v Fiona -T $textstring2 -c 10 $1 
+	say $2
+	displayText=''
+	textLength=${#2}
+	halfTextLength=$(expr $textLength / 2)
+	offSet=$(expr 30 - $halfTextLength)
+	#echo $offSet
+	displayText=$(eval $(echo printf '" %0.s"' {1..$offSet})) #insert padding
+	displayText="$diplayText$displayText$2$displayText"
+	result=$(osascript -e 'display dialog "'$displayText'" buttons {"Stop","Snooze"} default answer "2" default button "Snooze" with title "Snooze for 1 to 9 mins?" with icon caution')
+	resulttext=$(echo ${result:${#result}-1:1})
+	resultbutton=$(echo ${result:16:4})
+#	echo $resultbutton
+#	echo $resulttext
+
+	case $resultbutton in
+		"Stop")
+			mycontinue=0
+			;;
+		*)
+			mycontinue=1
+			timetype='M'
+			timer=$resulttext$timetype
+#			echo $timer
+			inXmins=$(date -v +$timer "+%H:%M:%S")
+#			echo $inXmins
+			;;
+	esac
+        textstring3=$2$'\n -- '$inXmins' --'
+	if [[ $mycontinue == 1 ]]
+	then
+		termdown -B -f $fontchoice -v Fiona -T $textstring3 -c 10 $inXmins
+	fi
+done
 # Uncomment this if you want a sound to play as well as the say command
 #afplay /System/Library/Sounds/Sosumi.aiff
 echo 
 # Says the word provided, if no word it says Alarm
-say $2
+#osascript -e 'display alert "'$2'"'
 # Shows when the code ended
 echo "Ended: $(date "+%H:%M:%S")"
 exit
