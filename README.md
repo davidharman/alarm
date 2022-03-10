@@ -23,4 +23,4 @@ alarm 13:50 'Staff Meeting'
 
 You will now get a timer for the remaining minutes showing the word meeting in the 'Starwars' font (default is 'big') from now until 10:00 and at the end a beep will sound and a dialog will appear asking if you want to snooze for an amount of minutes or to stop.  If you choose stop the code stops, if you click snooze it will snooze for the number of minutes entered (default is 2).
 
-  Please Note: If the font does not appear and you just have standard text then increase the terminal size, e.g. 26 rows high.
+  Please Note: If the font does not appear and you just have standard text then increase the terminal size, e.g. 27 rows high for the <b>big</b> font
