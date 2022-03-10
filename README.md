@@ -8,8 +8,9 @@ I wanted:
 - start and stop times to be shown if CTRL+C is shown 
 
 
-First install TermDown
-<i>pip install termdown</i>
+First install TermDown, you will need the python package which you can install via homebrew (https://brew.sh), but should be there by default
+<brew install python>
+<i>pip3 install termdown</i>
 
 Then place the alarm script from this repo in to your bin folder
 
