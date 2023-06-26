@@ -4,7 +4,7 @@ trap ctrl_c INT
 # Alarm 
 AlarmVersion=0.2
 # Author: David Harman
-# Date: 14th June 2023
+# Date: 26th June 2023
 # Script to have a countdown to a particular time and also have a snooze function
 # Requires: TermDown
 #    
