@@ -1,6 +1,14 @@
 #!/bin/zsh
 trap ctrl_c INT
 
+# Alarm 
+AlarmVersion=0.2
+# Author: David Harman
+# Date: 14th June 2023
+# Script to have a countdown to a particular time and also have a snooze function
+# Requires: TermDown
+#    
+
 function ctrl_c() {
         echo "** Trapped CTRL-C"
         echo "Stopped: $(date "+%H:%M:%S")"        
@@ -32,11 +40,11 @@ if [ -z "$2" ]; then
 fi
 fontchoice=$3
 if [ -z "$fontchoice" ]; then
-   fontchoice="big"
+   fontchoice="starwars"
 fi
 
-# Combine Text and Start Time
-textstring="$2$(date "+%n%H:%M:%S")"
+# Combine Text and Start Time (used to have a return line in date %n but this caused issues)
+textstring="$2$(date "+%H:%M:%S")"
 
 # Echo details of timer to confirm when timer was started, ended or cancelled and what the parameters where
 echo "Timer: $1" 
@@ -46,7 +54,10 @@ mycontinue=1
 # Command to show countdown timer using the parameters with the voice
 until [[ $mycontinue -eq 0 ]]
 do
-	termdown -B -f $fontchoice -v Fiona -T $textstring2 -c 10 $1 
+    echo $fontchoice
+    echo $textstring2
+    echo $1
+    termdown -B -f $fontchoice -v Fiona -T $textstring2 -c 10 $1
 	say $2
 	displayText=''
 	textLength=${#2}
@@ -55,11 +66,9 @@ do
 	#echo $offSet
 	displayText=$(eval $(echo printf '" %0.s"' {1..$offSet})) #insert padding
 	displayText="$diplayText$displayText$2$displayText"
-	result=$(osascript -e 'display dialog "'$displayText'" buttons {"Stop","Snooze"} default answer "2" default button "Snooze" with title "Snooze for 1 to 9 mins?" with icon caution')
-	resulttext=$(echo ${result:${#result}-1:1})
+	result=$(osascript -e 'display dialog "'$displayText'" buttons {"Stop","Snooze"} default answer "2" default button "Snooze" with title "Enter number of minutes to snooze for" with icon caution')
+	resulttext=${result##*:}
 	resultbutton=$(echo ${result:16:4})
-#	echo $resultbutton
-#	echo $resulttext
 
 	case $resultbutton in
 		"Stop")
