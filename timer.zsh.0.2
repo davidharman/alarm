@@ -1,0 +1,99 @@
+#!/bin/zsh
+trap ctrl_c INT
+
+# Timer 
+TimerVersion=0.2
+# Author: David Harman
+# Date: 22nd October 2025
+# Script to have a countdown to a particular time and also have a snooze function
+
+function ctrl_c() {
+  echo "** Trapped CTRL-C"
+  echo "Stopped: $(date "+%H:%M:%S")"        
+  exit
+}
+
+function parse_time_input() {
+  local input="$1"
+  if [[ "$input" =~ ^[0-9]+[smh]$ ]]; then
+    local unit="${input[-1]}"
+    local value="${input[1,-2]}"
+    case "$unit" in
+      s) echo "$value" ;;
+      m) echo "$((value * 60))" ;;
+      h) echo "$((value * 3600))" ;;
+    esac
+  elif [[ "$input" =~ ^[0-9]{1,2}:[0-9]{2}(:[0-9]{2})?$ ]]; then
+    local now_epoch=$(date +%s)
+    local today=$(date +%Y-%m-%d)
+    [[ "$input" =~ ^[0-9]{1,2}:[0-9]{2}$ ]] && input="$input:00"
+    local target_epoch=$(date -j -f "%Y-%m-%d %H:%M:%S" "$today $input" "+%s" 2>/dev/null)
+    (( target_epoch <= now_epoch )) && {
+      echo "Error: Time must be in the future." >&2
+      return 1
+    }
+    echo "$((target_epoch - now_epoch))"
+  else
+    echo "Invalid time format." >&2
+    return 1
+  fi
+}
+
+if [[ $# -eq 0 || "$1" == "-h" || "$1" == "--help" || "$1" == "-v" || "$1" == "--version" ]]; then
+  echo "Version: $TimerVersion"
+  echo "Usage: $0 <time> <message>"
+  echo "Example: $0 5m \"Break time!\""
+  exit 1
+fi
+
+time_input="$1"
+if [ -z $2 ]; then
+    2="Alarm"
+fi
+message="$2"
+
+mycontinue=1
+until [[ $mycontinue -eq 0 ]]
+do
+  seconds=$(parse_time_input "$time_input") || exit 1
+
+  # Echo details of timer to confirm when timer was started, ended or cancelled and what the parameters where
+  echo "$(date) - $1 $2" 
+  echo $textstring
+
+  while (( seconds > 10 )); do
+    printf "\r%02d:%02d:%02d - %s" $((seconds/3600)) $(((seconds%3600)/60)) $((seconds%60)) "$message"
+    sleep 1
+    ((seconds--))
+  done
+
+  echo ""
+  for (( i=$seconds; i>0; i-- )); do
+    #echo "$i..."
+    printf " $i ..."
+    say "$i"
+  done
+  mycontinue=0
+  say $message
+  echo $message
+
+ 	result=$(osascript -e 'display dialog "'$2'" buttons {"Stop","Snooze"} default answer "2" default button "Snooze" with title "Enter number of minutes to snooze for" with icon caution')
+  resulttext=${result##*:}
+	resultbutton=$(echo ${result:16:4})
+
+ 	case $resultbutton in
+		"Stop")
+			mycontinue=0
+			;;
+		*)
+			mycontinue=1
+			timetype='M'
+			timer=$resulttext$timetype
+			time_input=$(date -v +$timer "+%H:%M:%S")
+			;;
+	esac
+done
+
+echo ""
+echo "Ended: $(date)"
+exit
