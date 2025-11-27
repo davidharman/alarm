@@ -1,76 +1,85 @@
 #!/bin/zsh
 trap ctrl_c INT
 
-# Alarm 
-AlarmVersion=0.2
+# Timer 
+TimerVersion=0.4
 # Author: David Harman
-# Date: 26th June 2023
+# Date: 22nd October 2025
 # Script to have a countdown to a particular time and also have a snooze function
-# Requires: TermDown
-#    
 
 function ctrl_c() {
-        echo "** Trapped CTRL-C"
-        echo "Stopped: $(date "+%H:%M:%S")"        
-        exit
+  echo "** Trapped CTRL-C"
+  echo "Stopped: $(date "+%H:%M:%S")"        
+  exit
 }
-if [ "$1" = "-h" ]; then
-   echo "Usage: alarm [TIME] [TEXT] [FONT]
-  
-  Re-uses TermDown to default some options such as voice and font
 
-  Starts a countdown to or from TIME. Example values for TIME:
-  10, '1h 5m 30s', '12:00', '2020-01-01', '2020-01-01 14:00 UTC'.
+function parse_time_input() {
+  local input="$1"
+  if [[ "$input" =~ ^[0-9]+[smh]$ ]]; then
+    local unit="${input[-1]}"
+    local value="${input[1,-2]}"
+    case "$unit" in
+      s) echo "$value" ;;
+      m) echo "$((value * 60))" ;;
+      h) echo "$((value * 3600))" ;;
+    esac
+  elif [[ "$input" =~ ^[0-9]{1,2}:[0-9]{2}(:[0-9]{2})?$ ]]; then
+    local now_epoch=$(date +%s)
+    local today=$(date +%Y-%m-%d)
+    [[ "$input" =~ ^[0-9]{1,2}:[0-9]{2}$ ]] && input="$input:00"
+    local target_epoch=$(date -j -f "%Y-%m-%d %H:%M:%S" "$today $input" "+%s" 2>/dev/null)
+    (( target_epoch <= now_epoch )) && {
+      echo "Error: Time must be in the future." >&2
+      return 1
+    }
+    echo "$((target_epoch - now_epoch))"
+  else
+    echo "Invalid time format." >&2
+    return 1
+  fi
+}
 
-  If TIME is not given, termdown will operate in stopwatch mode
-  and count forward.
-
-  TEXT is optional, when used will provide a banner at the top to describe the alarm.
-
-  FONT is optional and if not provided will default to big font, other fonts are starwars, epic, isometric1, basic, doh
-  Default for termdown is univers
-
-  More examples here: http://www.figlet.org/examples.html
-"
-exit
+if [[ $# -eq 0 || "$1" == "-h" || "$1" == "--help" || "$1" == "-v" || "$1" == "--version" ]]; then
+  echo "Version: $TimerVersion"
+  echo "Usage: $0 <time> <message>"
+  echo "Example: $0 5m \"Break time!\""
+  exit 1
 fi
 
-if [ -z "$2" ]; then
-   2="Alarm"
+time_input="$1"
+if [ -z $2 ]; then
+    2="Alarm"
 fi
-fontchoice=$3
-if [ -z "$fontchoice" ]; then
-   fontchoice="starwars"
-fi
+message="$2"
 
-# Combine Text and Start Time (used to have a return line in date %n but this caused issues)
-textstring="$2$(date "+%H:%M:%S")"
+SCRIPT_DIR="$(dirname "$0")"
 
-# Echo details of timer to confirm when timer was started, ended or cancelled and what the parameters where
-echo "Timer: $1" 
-echo $textstring
-textstring2=$2$'\n -- '$1' --'
 mycontinue=1
-# Command to show countdown timer using the parameters with the voice
 until [[ $mycontinue -eq 0 ]]
 do
-    echo $fontchoice
-    echo $textstring2
-    echo $1
-    termdown -B -f $fontchoice -v Fiona -T $textstring2 -c 10 $1
-	say $2
-	displayText=''
-	textLength=${#2}
-	halfTextLength=$(expr $textLength / 2)
-	offSet=$(expr 30 - $halfTextLength)
-	#echo $offSet
-	displayText=$(eval $(echo printf '" %0.s"' {1..$offSet})) #insert padding
-	displayText="$diplayText$displayText$2$displayText"
-	result=$(osascript -e 'display dialog "'$displayText'" buttons {"Stop","Snooze"} default answer "2" default button "Snooze" with title "Enter number of minutes to snooze for" with icon caution')
-	resulttext=${result##*:}
+  seconds=$(parse_time_input "$time_input") || exit 1
+
+  # Echo details of timer to confirm when timer was started, ended or cancelled and what the parameters where
+  echo "$(date) - $1 $2" 
+  echo $textstring
+
+  while (( seconds > 10 )); do
+    printf "\r%02d:%02d:%02d - %s" $((seconds/3600)) $(((seconds%3600)/60)) $((seconds%60)) "$message"
+    sleep 1
+    ((seconds--))
+  done
+
+  echo ""
+  afplay "$SCRIPT_DIR/countdown.aif"
+  mycontinue=0
+  say $message
+  echo $message
+
+ 	result=$(osascript -e 'display dialog "'$2'" buttons {"Stop","Snooze"} default answer "2" default button "Snooze" with title "Enter number of minutes to snooze for" with icon caution')
+  resulttext=${result##*:}
 	resultbutton=$(echo ${result:16:4})
 
-	case $resultbutton in
+ 	case $resultbutton in
 		"Stop")
 			mycontinue=0
 			;;
@@ -78,22 +87,11 @@ do
 			mycontinue=1
 			timetype='M'
 			timer=$resulttext$timetype
-#			echo $timer
-			inXmins=$(date -v +$timer "+%H:%M:%S")
-#			echo $inXmins
+			time_input=$(date -v +$timer "+%H:%M:%S")
 			;;
 	esac
-        textstring3=$2$'\n -- '$inXmins' --'
-	if [[ $mycontinue == 1 ]]
-	then
-		termdown -B -f $fontchoice -v Fiona -T $textstring3 -c 10 $inXmins
-	fi
 done
-# Uncomment this if you want a sound to play as well as the say command
-#afplay /System/Library/Sounds/Sosumi.aiff
-echo 
-# Says the word provided, if no word it says Alarm
-#osascript -e 'display alert "'$2'"'
-# Shows when the code ended
-echo "Ended: $(date "+%H:%M:%S")"
+
+echo ""
+echo "Ended: $(date)"
 exit
