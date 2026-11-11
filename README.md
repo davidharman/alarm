@@ -1,26 +1,25 @@
 # alarm
-Alarm in Bash with the use of termdown (https://github.com/trehn/termdown).
 
-I wanted:
-- a simple alarm which can be set via a terminal (e.g. Bash, Zsh, etc)
-- only need to provide an hour and minute and optional text
-- a countdown to show how long left
-- start and stop times to be shown if CTRL+C is shown 
+macOS zsh script that wraps [`termdown`](https://github.com/trehn/termdown) to count down to a time, announce it with `say`, and offer a snooze dialog.
 
+## Usage
 
-First install TermDown, you will need the python package which you can install via homebrew (https://brew.sh), but should be there by default
-<brew install python>
-<i>pip3 install termdown</i>
+```
+./alarm [TIME] [TEXT] [FONT]
+./alarm 10 "Tea" starwars
+./alarm -h
+```
 
-Then place the alarm script from this repo in to your bin folder
+Requires `termdown`, and the macOS tools `say`, `osascript` and BSD `date`.
 
-Now run Alarm, command is alarm <time> [Text] [Font]
-  Text and Font are optional, if no text then it defaults to the word Alarm
+## Changelog
 
-alarm 10:00 Meeting starwars
+### 2026-11-11 - v0.4
+- **What changed:** The alarm text is now passed to `osascript` as an argument instead of being pasted into the AppleScript source. The snooze minutes are validated (whole number >= 1, otherwise 2 is used). Cancelling the dialog (Esc) now stops the alarm.
+- **Why:** A `"` in TEXT broke the dialog. Blank or non-numeric snooze input, or a cancelled dialog, left `termdown` with no target, so it counted up forever.
+- **How to use:** Nothing changes for the user. TEXT can now contain quotes, and a bad snooze value prints `Invalid snooze '...'` and snoozes for 2 minutes.
 
-alarm 13:50 'Staff Meeting'
-
-You will now get a timer for the remaining minutes showing the word meeting in the 'Starwars' font (default is 'big') from now until 10:00 and at the end a beep will sound and a dialog will appear asking if you want to snooze for an amount of minutes or to stop.  If you choose stop the code stops, if you click snooze it will snooze for the number of minutes entered (default is 2).
-
-  Please Note: If the font does not appear and you just have standard text then increase the terminal size, e.g. 27 rows high for the <b>big</b> font
+### 2026-11-11 - v0.3
+- **What changed:** Snoozing now counts down only the snooze time. The countdown target is held in a `target` variable and the loop has a single `termdown` call.
+- **Why:** In v0.2 the snooze ran its own `termdown`, then the loop restarted and ran the original TIME again before showing the dialog, so a 2 minute snooze took much longer.
+- **How to use:** Nothing changes for the user. Enter the snooze minutes in the dialog and press Snooze. The alarm sounds and the dialog reappears after those minutes.
